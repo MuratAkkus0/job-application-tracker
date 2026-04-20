@@ -9,6 +9,7 @@ This application helps job seekers organize and track their applications through
 ## Tech Stack
 
 **Frontend**
+
 - Next.js 16 (App Router, Server Components, Server Actions)
 - React 19 with TypeScript
 - Tailwind CSS 4
@@ -16,6 +17,7 @@ This application helps job seekers organize and track their applications through
 - dnd-kit for drag-and-drop
 
 **Backend**
+
 - MongoDB with Mongoose ODM
 - Better Auth for authentication
 - Server Actions for data mutations
@@ -24,21 +26,25 @@ This application helps job seekers organize and track their applications through
 ## Key Features
 
 ### Kanban Board Interface
+
 - Visual pipeline with customizable columns (Applied, Interview, Offer, Rejected)
 - Drag-and-drop cards between stages with smooth animations
 - Optimistic UI updates for instant feedback
 
 ### Job Application Management
+
 - Create, update, and delete job applications
 - Track company details, position, salary, and application dates
 - Real-time status updates with visual indicators
 
 ### Authentication & Security
+
 - Secure user authentication with Better Auth
 - Session-based access control
 - Protected routes and API endpoints
 
 ### Performance Optimizations
+
 - Server-side data fetching with caching
 - Optimistic state updates for better UX
 - Efficient database queries with Mongoose
@@ -62,22 +68,26 @@ This application helps job seekers organize and track their applications through
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone <repository-url>
 cd job-application-tracker
 ```
 
 2. Install dependencies
+
 ```bash
 pnpm install
 ```
 
 3. Set up environment variables
+
 ```bash
 cp .env.example .env.local
 ```
 
 Configure the following variables:
+
 ```env
 MONGODB_URI=your_mongodb_connection_string
 BETTER_AUTH_SECRET=your_auth_secret
@@ -85,11 +95,13 @@ BETTER_AUTH_URL=http://localhost:3000
 ```
 
 4. Run the development server
+
 ```bash
 pnpm dev
 ```
 
 5. (Optional) Seed the database with sample data
+
 ```bash
 pnpm seed:jobs
 ```
@@ -124,15 +136,5 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 - **Best Practices**: Following Next.js 16 and React 19 conventions
 - **Error Handling**: Comprehensive error handling with user feedback
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
-
-## Future Enhancements
-
-- Analytics dashboard for application statistics
-- Email notifications for important updates
-- Resume and cover letter management
-- Interview scheduling integration
-- Application notes and reminders
-
----
 
 Built with modern web technologies and best practices for optimal performance and developer experience.
