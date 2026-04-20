@@ -25,6 +25,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { HTMLAttributes, SubmitEvent, useState } from "react";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 interface JobApplicationCardProps {
   job: JobApplication;
@@ -49,11 +50,16 @@ export default function JobApplicationCard({
     try {
       const result = await deleteJobApplication(id);
       if (result.success) {
+        posthog.capture("job_application_deleted", {
+          company: job.company,
+          position: job.position,
+        });
         toast.success(result.message);
       } else {
         throw Error(result.message);
       }
     } catch {
+      posthog.captureException(new Error("Failed to delete job application"));
       toast.error("Failed to delete job apllication.");
       console.error("Failed to delete job apllication.");
     }
@@ -63,18 +69,30 @@ export default function JobApplicationCard({
     e.preventDefault();
     try {
       const result = await updateJobApplication(job._id, formData);
+      posthog.capture("job_application_updated", {
+        company: formData.company,
+        position: formData.position,
+      });
       console.log(result);
     } catch (err) {
+      posthog.captureException(err instanceof Error ? err : new Error("Failed to update job application"));
       console.error("Failed to update job application: ", err);
     }
   }
 
   async function handleMove(newColumnId: string) {
+    const targetColumn = columns.find((c) => c._id === newColumnId);
     try {
       await updateJobApplication(job._id, {
         columnId: newColumnId,
       });
+      posthog.capture("job_application_moved", {
+        company: job.company,
+        position: job.position,
+        target_column: targetColumn?.name,
+      });
     } catch (err) {
+      posthog.captureException(err instanceof Error ? err : new Error("Failed to move job application"));
       console.error("Failed to move job application: ", err);
     }
   }

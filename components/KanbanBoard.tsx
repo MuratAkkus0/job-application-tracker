@@ -41,6 +41,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useBoard } from "@/lib/hooks/useBoard";
+import posthog from "posthog-js";
 
 interface KanbanBoardProps {
   board: Board;
@@ -295,6 +296,16 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
     if (!targetColumnId) {
       return;
     }
+
+    const targetColumnName = sortedColumns.find((c) => c._id === targetColumnId)?.name;
+    const isColumnChange = sourceColumn._id !== targetColumnId;
+    posthog.capture("job_application_dragged", {
+      company: draggedJob.company,
+      position: draggedJob.position,
+      source_column: sourceColumn.name,
+      target_column: targetColumnName,
+      changed_column: isColumnChange,
+    });
 
     await moveJob(activeId, targetColumnId, newOrder);
   }
