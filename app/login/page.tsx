@@ -17,6 +17,7 @@ import { signIn } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useSession } from "@/lib/auth/auth-client";
+import posthog from "posthog-js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -39,6 +40,11 @@ export default function Login() {
       if (result.error) {
         setError(result.error.message || "Failed to login");
       } else {
+        posthog.identify(result.data?.user?.id ?? email, {
+          email: email,
+          name: result.data?.user?.name,
+        });
+        posthog.capture("user_logged_in", { email });
         router.push("/dashboard");
       }
     } catch {
