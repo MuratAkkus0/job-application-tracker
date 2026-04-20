@@ -5,6 +5,7 @@ import connectDB from "@/lib/db";
 import { Board, Column, JobApplication } from "@/lib/models";
 import { formatJobTags } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 interface JobApplicationData {
   company: string;
@@ -86,6 +87,20 @@ export async function createJobApplication(data: JobApplicationData) {
     });
 
     revalidatePath(`/dashboard`);
+
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: session.user.id,
+      event: "server_job_application_created",
+      properties: {
+        company,
+        position,
+        location,
+        has_salary: !!salary,
+        has_job_url: !!jobUrl,
+        column_name: column.name,
+      },
+    });
 
     return {
       success: true,

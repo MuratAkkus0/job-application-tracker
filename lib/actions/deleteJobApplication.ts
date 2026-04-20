@@ -5,6 +5,7 @@ import { JobApplication } from "@/lib/models";
 import { shiftJobsUp } from "@/lib/services";
 import { getOldPosition } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function deleteJobApplication(id: string) {
   const session = await getSession();
@@ -51,6 +52,16 @@ export async function deleteJobApplication(id: string) {
     const deletedJob = await JobApplication.findByIdAndDelete(_id).lean();
 
     revalidatePath("/dashboard");
+
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: session.user.id,
+      event: "server_job_application_deleted",
+      properties: {
+        company: jobApplication.company,
+        position: jobApplication.position,
+      },
+    });
 
     return {
       success: true,

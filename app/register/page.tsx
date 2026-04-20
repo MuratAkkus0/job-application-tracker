@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signUp } from "@/lib/auth/auth-client";
+import posthog from "posthog-js";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -65,6 +66,11 @@ export default function Register() {
       if (result.error) {
         setError(result.error.message || "Failed to register");
       } else {
+        posthog.identify(result.data?.user?.id ?? email, {
+          email: email,
+          name: name,
+        });
+        posthog.capture("user_signed_up", { email, name });
         router.push("/login");
       }
     } catch (error) {

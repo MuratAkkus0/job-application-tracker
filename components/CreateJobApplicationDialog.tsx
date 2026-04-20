@@ -17,6 +17,7 @@ import { Textarea } from "./ui/textarea";
 import { SubmitEvent, useState } from "react";
 import { createJobApplication } from "@/lib/actions";
 import { toast } from "sonner";
+import posthog from "posthog-js";
 
 interface CreateJobApplicationDialogProps {
   columnId: string;
@@ -48,10 +49,19 @@ export default function CreateJobApplicationDialog({
     });
 
     if (response.success) {
+      posthog.capture("job_application_created", {
+        company: formData.company,
+        position: formData.position,
+        location: formData.location,
+        has_salary: !!formData.salary,
+        has_job_url: !!formData.jobUrl,
+        tag_count: formData.tags ? formData.tags.split(",").filter(Boolean).length : 0,
+      });
       setOpen(false);
       setFormData(INITIAL_FORM_DATA);
       toast.success("The job application has been created successfully");
     } else {
+      posthog.captureException(new Error("Failed to create job application"));
       toast.error("Failed to create job application");
     }
   }
