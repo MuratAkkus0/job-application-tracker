@@ -8075,7 +8075,7 @@ snapshots:
   mongoose@9.5.0:
     dependencies:
       kareem: 3.3.0
-      mongodb: 7.1.1
+      mongodb: 7.2.0
       mpath: 0.9.0
       mquery: 6.0.0
       ms: 2.1.3
