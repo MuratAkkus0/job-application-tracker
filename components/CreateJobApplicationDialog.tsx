@@ -61,8 +61,8 @@ export default function CreateJobApplicationDialog({
       setFormData(INITIAL_FORM_DATA);
       toast.success("The job application has been created successfully");
     } else {
-      posthog.captureException(new Error("Failed to create job application"));
-      toast.error("Failed to create job application");
+      posthog.captureException(new Error(response.message));
+      toast.error(response.message);
     }
   }
 

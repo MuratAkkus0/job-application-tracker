@@ -92,7 +92,12 @@ Configure the following variables:
 MONGODB_URI=your_mongodb_connection_string
 BETTER_AUTH_SECRET=your_auth_secret
 BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
 ```
+
+PostHog analytics are optional; set `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` (and
+`NEXT_PUBLIC_POSTHOG_HOST` if not using PostHog Cloud EU) if you want events
+captured. See `.env.example` for the full list of variables.
 
 4. Run the development server
 
@@ -131,10 +136,9 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## Development Highlights
 
-- **Production-Ready Code**: Clean, maintainable, and scalable architecture
-- **Type Safety**: Full TypeScript coverage with strict mode
-- **Best Practices**: Following Next.js 16 and React 19 conventions
-- **Error Handling**: Comprehensive error handling with user feedback
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **TypeScript**: Written in TypeScript with strict mode enabled
+- **Conventions**: Follows Next.js 16 and React 19 patterns (Server Components, Server Actions)
+- **Validation & Error Handling**: Server actions validate input with Zod and return typed error results, with toast feedback in the UI
+- **Responsive Design**: Mobile-first layout with Tailwind CSS
 
-Built with modern web technologies and best practices for optimal performance and developer experience.
+Built as a learning/portfolio project to explore Next.js 16's App Router, Server Actions, and caching APIs alongside a MongoDB/Mongoose backend.

@@ -60,8 +60,8 @@ export default function JobApplicationCard({
       }
     } catch {
       posthog.captureException(new Error("Failed to delete job application"));
-      toast.error("Failed to delete job apllication.");
-      console.error("Failed to delete job apllication.");
+      toast.error("Failed to delete job application.");
+      console.error("Failed to delete job application.");
     }
   }
 
@@ -69,14 +69,20 @@ export default function JobApplicationCard({
     e.preventDefault();
     try {
       const result = await updateJobApplication(job._id, formData);
+      if ("success" in result && !result.success) {
+        throw new Error(result.message);
+      }
       posthog.capture("job_application_updated", {
         company: formData.company,
         position: formData.position,
       });
-      console.log(result);
+      toast.success("Job application updated successfully");
     } catch (err) {
       posthog.captureException(err instanceof Error ? err : new Error("Failed to update job application"));
       console.error("Failed to update job application: ", err);
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update job application.",
+      );
     }
   }
 
