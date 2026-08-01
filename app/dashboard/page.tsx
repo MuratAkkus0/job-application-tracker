@@ -1,12 +1,15 @@
 import KanbanBoard from "@/components/KanbanBoard";
 import { getSession } from "@/lib/auth/auth";
 import connectDB from "@/lib/db";
+import { getBoardCacheTag } from "@/lib/cache";
 import { Board } from "@/lib/models";
 import { cacheLife, cacheTag } from "next/cache";
 import { Suspense } from "react";
 
 async function getBoard(userId: string) {
   "use cache";
+  cacheTag(getBoardCacheTag(userId));
+  cacheLife("hours");
   await connectDB();
 
   const board = await Board.findOne({
