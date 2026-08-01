@@ -63,17 +63,23 @@ export function getAuth(): Promise<Auth> {
 }
 
 export async function getSession() {
+  // headers() is read BEFORE the auth instance is built on purpose: it marks
+  // the surrounding render as dynamic, so during a prerender Next bails out to
+  // the Suspense fallback here rather than continuing on and opening a
+  // database connection at build time.
+  const requestHeaders = await headers();
   const auth = await getAuth();
   const result = await auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
   return result;
 }
 
 export const signOut = async () => {
+  const requestHeaders = await headers();
   const auth = await getAuth();
   const result = await auth.api.signOut({
-    headers: await headers(),
+    headers: requestHeaders,
   });
   if (result.success) {
     redirect("/login");
