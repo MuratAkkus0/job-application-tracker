@@ -5,26 +5,28 @@ import connectDB from "@/lib/db";
 import { getBoardCacheTag } from "@/lib/cache";
 import { Board, Column, JobApplication } from "@/lib/models";
 import { formatJobTags } from "@/lib/utils";
+import {
+  createJobApplicationSchema,
+  flattenFieldErrors,
+  type CreateJobApplicationInput,
+} from "@/lib/validations/jobApplication";
 import { updateTag } from "next/cache";
 import { getPostHogClient } from "@/lib/posthog-server";
 
-interface JobApplicationData {
-  company: string;
-  position: string;
-  location?: string;
-  notes?: string;
-  salary?: string;
-  jobUrl?: string;
-  columnId: string;
-  boardId: string;
-  tags?: string;
-  description?: string;
-}
-
-export async function createJobApplication(data: JobApplicationData) {
+export async function createJobApplication(data: CreateJobApplicationInput) {
   const session = await getSession();
   if (!session?.user) {
     return { success: false, message: "Unauthorized" };
+  }
+
+  const parsed = createJobApplicationSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Please fix the highlighted fields",
+      fieldErrors: flattenFieldErrors(parsed.error),
+    };
   }
 
   const {
@@ -38,11 +40,7 @@ export async function createJobApplication(data: JobApplicationData) {
     boardId,
     tags,
     description,
-  } = data;
-
-  if (!company || !position || !columnId || !boardId) {
-    return { success: false, message: "Missing required fields" };
-  }
+  } = parsed.data;
 
   try {
     await connectDB();

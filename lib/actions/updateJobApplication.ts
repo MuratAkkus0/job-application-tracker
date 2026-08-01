@@ -6,26 +6,30 @@ import connectDB from "@/lib/db";
 import { getBoardCacheTag } from "@/lib/cache";
 import { Column, JobApplication } from "@/lib/models";
 import { formatJobTags } from "@/lib/utils";
+import {
+  flattenFieldErrors,
+  updateJobApplicationSchema,
+  type UpdateJobApplicationInput,
+} from "@/lib/validations/jobApplication";
 
 export async function updateJobApplication(
   id: string,
-  updates: {
-    company?: string;
-    position?: string;
-    location?: string;
-    notes?: string;
-    salary?: string;
-    jobUrl?: string;
-    columnId?: string;
-    targetIndex?: number;
-    tags?: string;
-    description?: string;
-  },
+  updates: UpdateJobApplicationInput,
 ) {
   const session = await getSession();
 
   if (!session?.user) {
     return { error: "Unauthorized" };
+  }
+
+  const parsed = updateJobApplicationSchema.safeParse(updates);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Please fix the highlighted fields",
+      fieldErrors: flattenFieldErrors(parsed.error),
+    };
   }
 
   try {
@@ -41,7 +45,7 @@ export async function updateJobApplication(
       return { error: "Unauthorized" };
     }
 
-    const { columnId, targetIndex, ...otherUpdates } = updates;
+    const { columnId, targetIndex, ...otherUpdates } = parsed.data;
 
     const updatesToApply: Partial<{
       company: string;
