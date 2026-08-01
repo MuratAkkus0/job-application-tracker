@@ -60,8 +60,8 @@ export default function JobApplicationCard({
       }
     } catch {
       posthog.captureException(new Error("Failed to delete job application"));
-      toast.error("Failed to delete job apllication.");
-      console.error("Failed to delete job apllication.");
+      toast.error("Failed to delete job application.");
+      console.error("Failed to delete job application.");
     }
   }
 
