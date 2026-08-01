@@ -2,9 +2,10 @@
 
 import { getSession } from "@/lib/auth/auth";
 import connectDB from "@/lib/db";
+import { getBoardCacheTag } from "@/lib/cache";
 import { Board, Column, JobApplication } from "@/lib/models";
 import { formatJobTags } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { getPostHogClient } from "@/lib/posthog-server";
 
 interface JobApplicationData {
@@ -86,7 +87,7 @@ export async function createJobApplication(data: JobApplicationData) {
       $push: { jobApplications: jobApplication._id },
     });
 
-    revalidatePath(`/dashboard`);
+    updateTag(getBoardCacheTag(session.user.id));
 
     const posthog = getPostHogClient();
     posthog.capture({

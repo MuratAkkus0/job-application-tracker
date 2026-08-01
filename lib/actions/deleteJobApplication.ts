@@ -1,10 +1,12 @@
 "use server";
 
 import { getSession } from "@/lib/auth/auth";
+import connectDB from "@/lib/db";
+import { getBoardCacheTag } from "@/lib/cache";
 import { JobApplication } from "@/lib/models";
 import { shiftJobsUp } from "@/lib/services";
 import { getOldPosition } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function deleteJobApplication(id: string) {
@@ -13,6 +15,8 @@ export async function deleteJobApplication(id: string) {
   if (!session?.user) {
     return { error: "Unauthorized" };
   }
+
+  await connectDB();
 
   const jobApplication = await JobApplication.findById(id);
 
@@ -36,7 +40,7 @@ export async function deleteJobApplication(id: string) {
     })
       .sort({ order: 1 })
       .lean();
-    console.log("other jobs in column : ", otherJobsInColumn);
+
     if (otherJobsInColumn.length > 0) {
       const currentJobOrder = jobApplication.order || 100;
       const oldPositionIndex = getOldPosition(
@@ -51,7 +55,7 @@ export async function deleteJobApplication(id: string) {
 
     const deletedJob = await JobApplication.findByIdAndDelete(_id).lean();
 
-    revalidatePath("/dashboard");
+    updateTag(getBoardCacheTag(session.user.id));
 
     const posthog = getPostHogClient();
     posthog.capture({
@@ -68,11 +72,11 @@ export async function deleteJobApplication(id: string) {
       message: "Job application deleted successfully",
       data: JSON.parse(JSON.stringify(deletedJob)),
     };
-  } catch (error) {
-    console.log(error);
+  } catch (err: unknown) {
+    console.error((err as Error)?.message);
     return {
       success: false,
-      message: "Failed to delete job application .",
+      message: "Failed to delete job application.",
     };
   }
 }
